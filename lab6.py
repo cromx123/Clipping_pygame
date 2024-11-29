@@ -95,8 +95,35 @@ def crear_ventana_preview(win=None, pixel_size=2):
     LineaBresenham(125, -50, 225, -50, win, pixel_size)   # arriba
     LineaBresenham(125, -50, 125, -150, win, pixel_size) # izquierda
     LineaBresenham(225, -50, 225, -150, win, pixel_size) # derecha
+
+def crear_ventana_undraw(win=None, pixel_size=2):
+    LineaBresenham_borrado(-150,-100,50,-100, win, pixel_size) # bajo
+    LineaBresenham_borrado(-150,100,50,100, win, pixel_size)   # arriba
+    LineaBresenham_borrado(-150,-100,-150,100, win, pixel_size) # izquierda
+    LineaBresenham_borrado(50,-100,50,100, win, pixel_size) # derecha
+    
+def crear_ventana_preview_undraw(win=None, pixel_size=2):
+    LineaBresenham_borrado(125, -150, 225, -150, win, pixel_size) # bajo
+    LineaBresenham_borrado(125, -50, 225, -50, win, pixel_size)   # arriba
+    LineaBresenham_borrado(125, -50, 125, -150, win, pixel_size) # izquierda
+    LineaBresenham_borrado(225, -50, 225, -150, win, pixel_size) # derecha
+
+def crear_ventana_activity(win=None, pixel_size=2):
+    # Dibujar los bordes de la ventana usando LineaBresenham
+    LineaBresenham(30, 50, 220, 50, win, pixel_size)   # línea inferior
+    LineaBresenham(30, 240, 220, 240, win, pixel_size) # línea superior
+    LineaBresenham(30, 50, 30, 240, win, pixel_size)   # línea izquierda
+    LineaBresenham(220, 50, 220, 240, win, pixel_size) # línea derecha
+
+def crear_ventana_activity_undraw(win=None, pixel_size=2):
+    # Dibujar los bordes de la ventana usando LineaBresenham
+    LineaBresenham_borrado(30, 50, 220, 50, win, pixel_size)   # línea inferior
+    LineaBresenham_borrado(30, 240, 220, 240, win, pixel_size) # línea superior
+    LineaBresenham_borrado(30, 50, 30, 240, win, pixel_size)   # línea izquierda
+    LineaBresenham_borrado(220, 50, 220, 240, win, pixel_size) # línea derecha
     
 personaje_elementos = []
+personaje_original = []
 def undraw_personaje(win, pixel_size):
     global personaje_elementos
     for elemento in personaje_elementos:
@@ -189,45 +216,93 @@ def crear_obj(win=None, pixel_size=2):
     return personaje_elementos
 
 def crear_obj_inicial(win=None, pixel_size=2):
+    # Función para transformar las coordenadas
     def transformar(x, y):
         escala_x, escala_y = 0.5, 0.5
         traslacion_x, traslacion_y = 200, -100
         return x * escala_x + traslacion_x, y * escala_y + traslacion_y
 
+    # Función para dibujar las líneas usando el algoritmo de Bresenham
     def dibujar_linea(x1, y1, x2, y2):
         x1, y1 = transformar(x1, y1)
         x2, y2 = transformar(x2, y2)
+        print(x1,y1,x2,y2, "\n")
         LineaBresenham(int(x1), int(y1), int(x2), int(y2), win, pixel_size)
     # Cabeza
     dibujar_linea(-50, 12, -20, 12)
     dibujar_linea(-50, 42, -20, 42)
     dibujar_linea(-50, 12, -50, 42)
     dibujar_linea(-20, 12, -20, 42)
+
     # Torso
     dibujar_linea(-50, -50, -20, -50)
     dibujar_linea(-50, 10, -20, 10)
     dibujar_linea(-50, -50, -50, 10)
     dibujar_linea(-20, -50, -20, 10)
+
     # Brazo 1
     dibujar_linea(-72, -50, -52, -50)
     dibujar_linea(-72, 10, -52, 10)
     dibujar_linea(-72, -50, -72, 10)
     dibujar_linea(-52, -50, -52, 10)
+
     # Brazo 2
     dibujar_linea(-18, -50, 2, -50)
     dibujar_linea(-18, 10, 2, 10)
     dibujar_linea(-18, -50, -18, 10)
     dibujar_linea(2, -50, 2, 10)
+
     # Pierna 1
-    dibujar_linea(-50, -50, -35, -50)
-    dibujar_linea(-50, -110, -35, -110)
+    dibujar_linea(-50, -50, -34, -50)
+    dibujar_linea(-50, -110, -34, -110)
     dibujar_linea(-50, -50, -50, -110)
-    dibujar_linea(-35, -50, -35, -110)
+    dibujar_linea(-34, -50, -34, -110)
+
     # Pierna 2
-    dibujar_linea(-35, -50, -20, -50)
-    dibujar_linea(-35, -110, -20, -110)
-    dibujar_linea(-35, -50, -35, -110)
+    dibujar_linea(-34, -50, -20, -50)
+    dibujar_linea(-34, -110, -20, -110)
+    dibujar_linea(-34, -50, -34, -110)
     dibujar_linea(-20, -50, -20, -110)
+
+    personaje_original = [
+        # Cabeza
+        (175, -94, 190, -94),  # Línea superior izquierda
+        (175, -79, 190, -79),  # Línea superior derecha
+        (175, -94, 175, -79),  # Línea izquierda
+        (190, -94, 190, -79),  # Línea derecha
+        
+        # Torso
+        (175, -125, 190, -125),  # Línea inferior izquierda
+        (175, -95, 190, -95),    # Línea superior izquierda
+        (175, -125, 175, -95),   # Línea izquierda
+        (190, -125, 190, -95),   # Línea derecha
+        
+        # Brazo 1 (izquierdo)
+        (164, -125, 174, -125),  # Línea inferior
+        (164, -95, 174, -95),    # Línea superior
+        (164, -125, 164, -95),   # Línea izquierda
+        (174, -125, 174, -95),   # Línea derecha
+        
+        # Brazo 2 (derecho)
+        (191, -125, 201, -125),    # Línea inferior
+        (191, -95, 201, -95),      # Línea superior
+        (191, -125, 191, -95),   # Línea izquierda
+        (201, -125, 201, -95),       # Línea derecha
+        
+        # Pierna 1 (izquierda)
+        (175, -125, 183, -125),  # Línea superior izquierda
+        (175, -155, 183, -155),  # Línea inferior izquierda
+        (175, -125, 175, -155),  # Línea izquierda
+        (183, -125, 183, -155),  # Línea derecha
+        
+        # Pierna 2 (derecha)
+        (183, -125, 190, -125),  # Línea superior izquierda
+        (183, -155, 190, -155),  # Línea inferior izquierda
+        (183, -125, 183, -155),  # Línea izquierda
+        (190, -125, 190, -155),  # Línea derecha
+    ]
+    
+    return personaje_original
 
 def codificar_punto(x, y, xmin, xmax, ymin, ymax):
     code = 0
@@ -435,9 +510,61 @@ def recortar_personaje_exahustivo(personaje_elementos, xmin, xmax, ymin, ymax):
             personaje_recortado.append(recortado)
     return personaje_recortado
 
+def menu(spacing = 40, button_width = 140, button_height = 30):
+    # Crear un objeto de texto
+    saludo_text = Text(Point(0, 5 * spacing), "¡Hola, Bienvenidos al Programa de Representaciones Graficas!")
+    saludo_text.setSize(15)          
+    saludo_text.setStyle("bold")      
+    saludo_text.draw(win)
+    
+    lab_text = Text(Point(0, 4 * spacing), "Laboratorio 06: Clipping en 2D")
+    lab_text.setSize(13)          
+    lab_text.setStyle("bold")      
+    lab_text.draw(win)
+    
+    autores_text = Text(Point(0, 2 * spacing), "Autores: \nVicente Santos\nCristobal Gallardo")
+    autores_text.setSize(12) 
+    autores_text.setStyle("bold")      
+    autores_text.draw(win)
+    
+    iniciar_button = Button(win, Point(0, -50), button_width + 30, button_height, "Empezar programa")
+    activity_button = Button(win, Point(0, -50- spacing), button_width + 30, button_height, "Empezar actividad")
+    salir_button = Button(win, Point(0, -50 - 2 *spacing), button_width + 30, button_height, "Salir")
+    
+    iniciar_button.activate()
+    activity_button.activate()
+    salir_button.activate()
+    
+    while True:
+        click_point = win.getMouse()
+        
+        if iniciar_button.is_clicked(click_point):
+            # Borrar pantalla de inicio
+            saludo_text.undraw()          
+            lab_text.undraw()          
+            autores_text.undraw()
+            iniciar_button.undraw()     
+            activity_button.undraw()
+            salir_button.undraw()
+            print("Mensaje y botón borrados")
+            return 1
+        elif activity_button.is_clicked(click_point):
+            # Borrar pantalla de inicio
+            saludo_text.undraw()          
+            lab_text.undraw()          
+            autores_text.undraw()
+            iniciar_button.undraw()     
+            activity_button.undraw()
+            salir_button.undraw()
+            print("Mensaje y botón borrados")
+            return 2
+        elif salir_button.is_clicked(click_point):
+            win.close()
+            return 0
+        
 # Función principal
 def main():
-    global personaje_elementos, win
+    global personaje_elementos, win, personaje_original
     # Inicialización de variables
     width = 1000
     height = 1000
@@ -456,135 +583,253 @@ def main():
     print("\n\tBienvenidos al Programa de Representaciones Graficas")
     print("\nAutores : \n  Vicente Santos\n  Cristobal Gallardo")
     
-    # Crear un objeto de texto
-    saludo_text = Text(Point(0, 5 * spacing), "¡Hola, Bienvenidos al Programa de Representaciones Graficas!")
-    saludo_text.setSize(15)          
-    saludo_text.setStyle("bold")      
-    saludo_text.draw(win)
-    
-    lab_text = Text(Point(0, 4 * spacing), "Laboratorio 06: Clipping en 2D")
-    lab_text.setSize(13)          
-    lab_text.setStyle("bold")      
-    lab_text.draw(win)
-    
-    autores_text = Text(Point(0, 2 * spacing), "Autores: \nVicente Santos\nCristobal Gallardo")
-    autores_text.setSize(12) 
-    autores_text.setStyle("bold")      
-    autores_text.draw(win)
-    
-    iniciar_button = Button(win, Point(0, -50), button_width + 30, button_height, "Empezar programa")
-    salir_button = Button(win, Point(0, -50 - spacing), button_width + 30, button_height, "Salir")
-    
-    iniciar_button.activate()
-    salir_button.activate()
-    
     while True:
-        click_point = win.getMouse()
+        program_on = menu(spacing, button_width, button_height)
         
-        if iniciar_button.is_clicked(click_point):
-            # Borrar pantalla de inicio
-            saludo_text.undraw()          
-            lab_text.undraw()          
-            autores_text.undraw()
-            iniciar_button.undraw()     
-            salir_button.undraw()
-            print("Mensaje y botón borrados")
-            program_on = 1
-            break  
-        
-        elif salir_button.is_clicked(click_point):
-            win.close()
-            program_on =  0
-
+        if program_on == 1:
+            
+            # Crear botones en el borde superior derecho
+            crear_obj_button = Button(win, Point(x_position, y_start + 3 * spacing), button_width, button_height, "Crear personaje")
+            aplicar_Sutherland_button = Button(win, Point(x_position, y_start + 2 * spacing), button_width, button_height, "Cohen-Sutherland")
+            aplicarCyrus_button = Button(win, Point(x_position, y_start +  spacing), button_width, button_height, "Cyrus-Beck")
+            aplicarExa_button = Button(win, Point(x_position, y_start), button_width, button_height, "Exahustivo")
+            volver_button = Button(win, Point(x_position, y_start -  spacing), button_width, button_height, "Volver")
+            salir_button = Button(win, Point(x_position, y_start - 2 * spacing), button_width, button_height, "Salir")
+            
+            error_text = Text(Point(0, 5 * spacing), "Ingrese un número valido")
+            error_text.setSize(18) 
+            error_text.setTextColor("red")
+            error_text.setStyle("bold") 
+            
+            post_text = Text(Point(x_position, y_start - 4 * spacing + 20), "Pre-Clipping")
+            post_text.setSize(10)          
+            post_text.setStyle("bold")      
+            post_text.draw(win)  
+            # Activar los botones
+            crear_obj_button.activate()
+            aplicar_Sutherland_button.activate()
+            aplicarCyrus_button.activate()
+            aplicarExa_button.activate()
+            volver_button.activate()
+            salir_button.activate()
+            # Declaraciones extras
+            xmin, xmax, ymin, ymax = -150, 50, -100, 100
+            
+            # Esperar a que el usuario haga clic en uno de los botones
+            running = True
+            while running:
+                    
+                crear_ventana(win= win)
+                crear_ventana_preview(win= win)
+                click_point = win.getMouse()   
+                    
+                if crear_obj_button.is_clicked(click_point):
+                    personaje_elementos = crear_obj(win, pixel_size)
+                    personaje_original =  crear_obj_inicial(win,pixel_size)
+                elif aplicar_Sutherland_button.is_clicked(click_point):
+                    # Aplicar algoritmo de Cohen-Sutherland
+                    personaje_recortado = recortar_personaje(personaje_elementos, xmin, xmax, ymin, ymax)
+                    
+                    # undraw_personaje(win,pixel_size)
+                    for (x1, y1, x2, y2) in personaje_elementos:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                    # Dibujar las líneas del personaje recortadas
+                    for (x1, y1, x2, y2) in personaje_recortado:
+                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "blue")
+                        
+                elif aplicarCyrus_button.is_clicked(click_point):
+                    # Aplicar algoritmo de Cyrus-Beck
+                    personaje_recortado = recortar_personaje_cyrus(personaje_elementos, xmin, xmax, ymin, ymax)
+                    
+                    # undraw_personaje(win,pixel_size)
+                    for (x1, y1, x2, y2) in personaje_elementos:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                        
+                    # Dibujar las líneas del personaje recortadas
+                    for (x1, y1, x2, y2) in personaje_recortado:
+                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "red")
+                        
+                elif aplicarExa_button.is_clicked(click_point):
+                    # Aplicar algoritmo de Cyrus-Beck
+                    personaje_recortado = recortar_personaje_exahustivo(personaje_elementos, xmin, xmax, ymin, ymax)
+                    
+                    # undraw_personaje(win,pixel_size)
+                    for (x1, y1, x2, y2) in personaje_elementos:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                        
+                    # Dibujar las líneas del personaje recortadas
+                    for (x1, y1, x2, y2) in personaje_recortado:
+                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "green")
+                elif volver_button.is_clicked(click_point):
+                    
+                    crear_obj_button.undraw()
+                    aplicar_Sutherland_button.undraw()
+                    aplicarCyrus_button.undraw()
+                    aplicarExa_button.undraw()
+                    volver_button.undraw()
+                    salir_button.undraw()
+                    post_text.undraw()
+                    crear_ventana_undraw(win= win)
+                    crear_ventana_preview_undraw(win= win)
+                    for (x1, y1, x2, y2) in personaje_elementos:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                    for (x1, y1, x2, y2) in personaje_original:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                    running = False
+                elif salir_button.is_clicked(click_point):
+                    win.close()
+                    break
+        elif program_on == 2:
+            # Crear botones en el borde superior derecho
+            crear_ventana_button = Button(win, Point(x_position * -1, y_start + 6 * spacing), button_width, button_height, "Crear ventana")
+            crear_linea_button = Button(win, Point(x_position * -1, y_start + 5 * spacing), button_width, button_height, "Crear linea")
+            aplicar_Sutherland_button = Button(win, Point(x_position  * -1, y_start ), button_width, button_height, "Cohen-Sutherland")
+            aplicarCyrus_button = Button(win, Point(x_position  * -1, y_start - spacing), button_width, button_height, "Cyrus-Beck")
+            aplicarExa_button = Button(win, Point(x_position  * -1, y_start - 2 * spacing), button_width, button_height, "Exahustivo")
+            volver_button = Button(win, Point(x_position * -1, y_start - 3 * spacing), button_width, button_height, "Volver")
+            salir_button = Button(win, Point(x_position * -1, y_start - 4 * spacing), button_width, button_height, "Salir")
+            
+            error_text = Text(Point(0, 5 * spacing), "Ingrese un número valido")
+            error_text.setSize(18) 
+            error_text.setTextColor("red")
+            error_text.setStyle("bold") 
+            
+            x1_text = Text(Point((x_position * -1 )-30, y_start + 4 * spacing), "x1")
+            x1_text.setSize(10)          
+            x1_text.setStyle("bold")      
+            x1_text.draw(win)  
+            ingresar_texto_x1= Entry(Point((x_position * -1) + 30, y_start + 4 * spacing), 6)
+            ingresar_texto_x1.setFill("lightgray")
+            
+            
+            y1_text = Text(Point((x_position * -1 )-30, y_start + 3 * spacing), "y1")
+            y1_text.setSize(10)          
+            y1_text.setStyle("bold")      
+            y1_text.draw(win)  
+            ingresar_texto_y1= Entry(Point((x_position * -1) + 30, y_start + 3 * spacing), 6)
+            ingresar_texto_y1.setFill("lightgray")
+            
+            x2_text = Text(Point((x_position * -1 )-30, y_start + 2 * spacing), "x2")
+            x2_text.setSize(10)          
+            x2_text.setStyle("bold")      
+            x2_text.draw(win)  
+            ingresar_texto_x2= Entry(Point((x_position * -1) + 30, y_start + 2 * spacing), 6)
+            ingresar_texto_x2.setFill("lightgray")
+            
+            y2_text = Text(Point((x_position * -1 )-30, y_start +  spacing), "y2")
+            y2_text.setSize(10)          
+            y2_text.setStyle("bold")      
+            y2_text.draw(win)  
+            ingresar_texto_y2= Entry(Point((x_position * -1) + 30, y_start + spacing), 6)
+            ingresar_texto_y2.setFill("lightgray")
+            # Activar los botones
+            crear_ventana_button.activate()
+            crear_linea_button.activate()
+            ingresar_texto_x1.draw(win)
+            ingresar_texto_y1.draw(win)
+            ingresar_texto_x2.draw(win)
+            ingresar_texto_y2.draw(win)
+            aplicar_Sutherland_button.activate()
+            aplicarCyrus_button.activate()
+            aplicarExa_button.activate()
+            volver_button.activate()
+            salir_button.activate()
+            # Declaraciones extras
+            xmin, xmax, ymin, ymax = 30, 220, 50, 240
+            mensaje = 0
+            puntos = []
+            # Esperar a que el usuario haga clic en uno de los botones
+            running = True
+            while running:
+                crear_ventana_activity(win=win)
+                click_point = win.getMouse()   
+                    
+                if crear_ventana_button.is_clicked(click_point):
+                    crear_ventana_activity(win=win)
+                elif crear_linea_button.is_clicked(click_point):
+                    texto_x1 = ingresar_texto_x1.getText()
+                    texto_y1 = ingresar_texto_y1.getText()
+                    texto_x2 = ingresar_texto_x2.getText()
+                    texto_y2 = ingresar_texto_y2.getText()
+                    
+                    try:
+                        P_x1 = int(texto_x1)
+                        P_y1 = int(texto_y1)
+                        P_x2 = int(texto_x2)
+                        P_y2 = int(texto_y2)
+                        
+                        puntos.append((P_x1, P_y1, P_x2, P_y2))
+                        LineaBresenham(P_x1,P_y1,P_x2,P_y2,win,pixel_size)
+                        error_text.undraw()  
+                    except ValueError:
+                        print("Error: Ingresa un número entero.")
+                        error_text.setText("Error: Ingresa un número entero.")
+                        if mensaje == 0:
+                            error_text.draw(win)
+                            mensaje = 1
+                        ingresar_texto_x1.setText("")
+                        
+                elif aplicar_Sutherland_button.is_clicked(click_point):
+                    # Aplicar algoritmo de Cohen-Sutherland
+                    puntos_recortado = recortar_personaje(puntos, xmin, xmax, ymin, ymax)
+                    
+                    # undraw_personaje(win,pixel_size)
+                    for (x1, y1, x2, y2) in puntos:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                    # Dibujar las líneas del personaje recortadas
+                    for (x1, y1, x2, y2) in puntos_recortado:
+                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "blue")
+                        
+                elif aplicarCyrus_button.is_clicked(click_point):
+                    # Aplicar algoritmo de Cyrus-Beck
+                    puntos_recortado = recortar_personaje_cyrus(puntos, xmin, xmax, ymin, ymax)
+                    
+                    # undraw_personaje(win,pixel_size)
+                    for (x1, y1, x2, y2) in puntos:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                        
+                    # Dibujar las líneas del personaje recortadas
+                    for (x1, y1, x2, y2) in puntos_recortado:
+                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "red")
+                        
+                elif aplicarExa_button.is_clicked(click_point):
+                    # Aplicar algoritmo de Cyrus-Beck
+                    puntos_recortado = recortar_personaje_exahustivo(puntos, xmin, xmax, ymin, ymax)
+                    
+                    # undraw_personaje(win,pixel_size)
+                    for (x1, y1, x2, y2) in puntos:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                        
+                    # Dibujar las líneas del personaje recortadas
+                    for (x1, y1, x2, y2) in puntos_recortado:
+                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "green")
+                elif volver_button.is_clicked(click_point):
+                    
+                    crear_ventana_button.undraw()
+                    crear_linea_button.undraw()
+                    aplicar_Sutherland_button.undraw()
+                    aplicarCyrus_button.undraw()
+                    aplicarExa_button.undraw()
+                    volver_button.undraw()
+                    salir_button.undraw()
+                    
+                    crear_ventana_activity_undraw(win=win)
+                    x1_text.undraw()
+                    y1_text.undraw()
+                    x2_text.undraw()
+                    y2_text.undraw()
+                    
+                    ingresar_texto_x1.undraw()
+                    ingresar_texto_y1.undraw()
+                    ingresar_texto_x2.undraw()
+                    ingresar_texto_y2.undraw()
+                    # undraw_personaje(win,pixel_size)
+                    for (x1, y1, x2, y2) in puntos:
+                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
+                    running = False
+                elif salir_button.is_clicked(click_point):
+                    win.close()
+                    break
+        elif program_on == 0:
             break
-    if program_on == 1:
-        
-        # Crear botones en el borde superior derecho
-        crear_obj_button = Button(win, Point(x_position, y_start + 3 * spacing), button_width, button_height, "Crear personaje")
-        aplicar_Sutherland_button = Button(win, Point(x_position, y_start + 2 * spacing), button_width, button_height, "Cohen-Sutherland")
-        aplicarCyrus_button = Button(win, Point(x_position, y_start +  spacing), button_width, button_height, "Cyrus-Beck")
-        aplicarExa_button = Button(win, Point(x_position, y_start), button_width, button_height, "Exahustivo")
-        # arriba_button = Button(win, Point(x_position, y_start ), button_width/3, button_height, "^")
-        # abajo_button  = Button(win, Point(x_position, y_start - 1 * spacing), button_width/3, button_height, "v")
-        # izquierda_button  = Button(win, Point(x_position - 50, y_start - 0.5 * spacing), button_width/3, button_height, "<-")
-        # derecha_button  = Button(win, Point(x_position + 50,  y_start - 0.5 * spacing), button_width/3, button_height, "->")
-        salir_button = Button(win, Point(x_position, y_start - 2 * spacing), button_width, button_height, "Salir")
-        
-        error_text = Text(Point(0, 5 * spacing), "Ingrese un número valido")
-        error_text.setSize(18) 
-        error_text.setTextColor("red")
-        error_text.setStyle("bold") 
-        
-        post_text = Text(Point(x_position, y_start - 4 * spacing + 20), "Pre-Clipping")
-        post_text.setSize(10)          
-        post_text.setStyle("bold")      
-        post_text.draw(win)  
-        # Activar los botones
-        crear_obj_button.activate()
-        aplicar_Sutherland_button.activate()
-        aplicarCyrus_button.activate()
-        aplicarExa_button.activate()
-        # arriba_button.activate()
-        # abajo_button.activate()
-        # izquierda_button.activate()
-        # derecha_button.activate()
-        salir_button.activate()
-        # Declaraciones extras
-        xmin, xmax, ymin, ymax = -150, 50, -100, 100
-        
-        # Esperar a que el usuario haga clic en uno de los botones
-        running = True
-        while running:
-                
-            crear_ventana(win= win)
-            crear_ventana_preview(win= win)
-            click_point = win.getMouse()   
-                
-            if crear_obj_button.is_clicked(click_point):
-                personaje_elementos = crear_obj(win, pixel_size)
-                crear_obj_inicial(win,pixel_size)
-            elif aplicar_Sutherland_button.is_clicked(click_point):
-                # Aplicar algoritmo de Cohen-Sutherland
-                personaje_recortado = recortar_personaje(personaje_elementos, xmin, xmax, ymin, ymax)
-                
-                # undraw_personaje(win,pixel_size)
-                for (x1, y1, x2, y2) in personaje_elementos:
-                    LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
-                # Dibujar las líneas del personaje recortadas
-                for (x1, y1, x2, y2) in personaje_recortado:
-                    LineaBresenham(x1, y1, x2, y2, win, 2, color= "blue")
-                    
-            elif aplicarCyrus_button.is_clicked(click_point):
-                # Aplicar algoritmo de Cyrus-Beck
-                personaje_recortado = recortar_personaje_cyrus(personaje_elementos, xmin, xmax, ymin, ymax)
-                
-                # undraw_personaje(win,pixel_size)
-                for (x1, y1, x2, y2) in personaje_elementos:
-                    LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
-                    
-                # Dibujar las líneas del personaje recortadas
-                for (x1, y1, x2, y2) in personaje_recortado:
-                    LineaBresenham(x1, y1, x2, y2, win, 2, color= "red")
-                    
-            elif aplicarExa_button.is_clicked(click_point):
-                # Aplicar algoritmo de Cyrus-Beck
-                personaje_recortado = recortar_personaje_exahustivo(personaje_elementos, xmin, xmax, ymin, ymax)
-                
-                # undraw_personaje(win,pixel_size)
-                for (x1, y1, x2, y2) in personaje_elementos:
-                    LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
-                    
-                # Dibujar las líneas del personaje recortadas
-                for (x1, y1, x2, y2) in personaje_recortado:
-                    LineaBresenham(x1, y1, x2, y2, win, 2, color= "green")
-            # elif arriba_button.is_clicked(click_point):
-            #     personaje_elementos = mover_personaje(personaje_elementos, 'arriba')
-                
-            # elif abajo_button.is_clicked(click_point):
-            #     personaje_elementos = mover_personaje(personaje_elementos, 'abajo')
-            
-            elif salir_button.is_clicked(click_point):
-                win.close()
-                break
-            
 main()
