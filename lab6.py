@@ -536,6 +536,7 @@ def main():
             aplicarExa_button = Button(win, Point(x_position, y_start+ spacing), button_width, button_height, "Exahustivo")
             volver_button = Button(win, Point(x_position, y_start ), button_width, button_height, "Volver")
             salir_button = Button(win, Point(x_position, y_start - spacing), button_width, button_height, "Salir")
+
             
             error_text = Text(Point(0, 5 * spacing), "Ingrese un número valido")
             error_text.setSize(18) 
@@ -576,11 +577,11 @@ def main():
                     # Dibujar las líneas del personaje recortadas
                     for (x1, y1, x2, y2) in personaje_recortado:
                         LineaBresenham(x1, y1, x2, y2, win, 2, color= "blue")
-                        
+
                 elif aplicarExa_button.is_clicked(click_point):
                     # Aplicar algoritmo de Cyrus-Beck
                     personaje_recortado = recortar_personaje_exahustivo(personaje_elementos, xmin, xmax, ymin, ymax)
-                    
+                
                     # undraw_personaje(win,pixel_size)
                     for (x1, y1, x2, y2) in personaje_elementos:
                         LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
@@ -613,6 +614,7 @@ def main():
             aplicar_Sutherland_button = Button(win, Point(x_position  * -1, y_start ), button_width, button_height, "Cohen-Sutherland")
             volver_button = Button(win, Point(x_position * -1, y_start - 1 * spacing), button_width, button_height, "Volver")
             salir_button = Button(win, Point(x_position * -1, y_start - 2 * spacing), button_width, button_height, "Salir")
+
             
             error_text = Text(Point(0, 5 * spacing), "Ingrese un número valido")
             error_text.setSize(18) 
@@ -625,8 +627,6 @@ def main():
             x1_text.draw(win)  
             ingresar_texto_x1= Entry(Point((x_position * -1) + 30, y_start + 4 * spacing), 6)
             ingresar_texto_x1.setFill("lightgray")
-            
-            
             y1_text = Text(Point((x_position * -1 )-30, y_start + 3 * spacing), "y1")
             y1_text.setSize(10)          
             y1_text.setStyle("bold")      
@@ -640,7 +640,6 @@ def main():
             x2_text.draw(win)  
             ingresar_texto_x2= Entry(Point((x_position * -1) + 30, y_start + 2 * spacing), 6)
             ingresar_texto_x2.setFill("lightgray")
-            
             y2_text = Text(Point((x_position * -1 )-30, y_start +  spacing), "y2")
             y2_text.setSize(10)          
             y2_text.setStyle("bold")      
@@ -702,6 +701,7 @@ def main():
                     # Dibujar las líneas del personaje recortadas
                     for (x1, y1, x2, y2) in puntos_recortado:
                         LineaBresenham(x1, y1, x2, y2, win, 2, color= "blue")
+
                 elif volver_button.is_clicked(click_point):
                     
                     crear_ventana_button.undraw()
