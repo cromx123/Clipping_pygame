@@ -18,7 +18,7 @@ RED = (255, 0, 0)
 width = 1000
 height = 1000
 pixel_size = 2
-win = GraphWin("Clipping pro 4k 100% real no fake", width, height)
+win = GraphWin("Laboratorio 4, Clipping", width, height)
 
 class Button:
     def __init__(self, win, center, width, height, label):
@@ -345,6 +345,9 @@ def cohen_sutherland_clip(x1, y1, x2, y2, xmin, xmax, ymin, ymax):
                 y = y1 + (y2 - y1) * (xmin - x1) / (x2 - x1)
                 x = xmin
 
+            # Redondeamos a enteros
+            x, y = round(x), round(y)
+            
             # Actualizar el punto fuera de la ventana
             if code_out == code1:
                 x1, y1 = x, y
@@ -367,139 +370,68 @@ def recortar_personaje(personaje_elementos, xmin, xmax, ymin, ymax):
             personaje_recortado.append(recortado)
     return personaje_recortado
 
-def producto_punto(v1, v2):
-    """Calcula el producto punto entre dos vectores v1 y v2."""
-    return v1[0] * v2[0] + v1[1] * v2[1]
-
-def intersecar_linea(p1, p2, borde):
-    """Calcula el punto de intersección entre la línea p1-p2 y un borde dado."""
-    # El borde se define como (P, N), donde P es un punto en el borde y N es el vector normal
-    P, N = borde
-    d1 = p1[0] - P[0], p1[1] - P[1]  # Vector desde P hasta p1
-    d2 = p2[0] - P[0], p2[1] - P[1]  # Vector desde P hasta p2
-    
-    # Producto punto de los dos extremos con el normal del borde
-    t = producto_punto(N, d1) / producto_punto(N, (d2[0] - d1[0], d2[1] - d1[1]))
-    
-    # Si t está entre 0 y 1, significa que la intersección está en el segmento
-    if 0 <= t <= 1:
-        # Calcular la intersección en el segmento
-        interseccion = (p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1]))
-        return interseccion
-    else:
-        return None  # No hay intersección dentro del segmento
-
-def cyrus_beck_clip(x1, y1, x2, y2, xmin, xmax, ymin, ymax):
-    """Aplica el algoritmo Cyrus-Beck para recortar una línea dentro de una ventana rectangular."""
-    # Definir los 4 bordes del rectángulo: (P, N), donde P es un punto del borde y N es el vector normal
-    bordes = [
-        ((xmin, ymin), (0, 1)),  # Borde inferior: (P, N)
-        ((xmax, ymin), (1, 0)),  # Borde derecho
-        ((xmax, ymax), (0, -1)),  # Borde superior
-        ((xmin, ymax), (-1, 0))   # Borde izquierdo
-    ]
-    
-    t_in = 0.0  # Parámetro t para la intersección
-    t_out = 1.0  # Parámetro t para la intersección
-
-    # Recorrer los bordes del rectángulo
-    for P, N in bordes:
-        # Calcular los productos puntos
-        d1 = (x1 - P[0], y1 - P[1])
-        d2 = (x2 - P[0], y2 - P[1])
-        
-        # Producto punto
-        p1 = producto_punto(N, d1)
-        p2 = producto_punto(N, d2)
-        
-        # Si ambos productos punto son positivos, la línea está completamente dentro del borde
-        if p1 >= 0 and p2 >= 0:
-            continue  # La línea está completamente dentro de la ventana (no se recorta)
-        
-        # Si ambos productos punto son negativos, la línea está completamente fuera del borde
-        if p1 <= 0 and p2 <= 0:
-            continue  # La línea está completamente fuera del borde (descartarla)
-        
-        # Calcular el parámetro t de la intersección
-        t = p1 / (p1 - p2)
-        
-        # Actualizar t_in y t_out para limitar la línea
-        if p1 > 0:
-            t_in = max(t_in, t)  # El recorte debe estar dentro de la ventana
-        else:
-            t_out = min(t_out, t)  # El recorte debe estar dentro de la ventana
-    
-    # Si t_in > t_out, no hay intersección
-    if t_in > t_out:
-        return None
-    
-    # Si hay intersección, recortar la línea
-    x1_recortado = x1 + (x2 - x1) * t_in
-    y1_recortado = y1 + (y2 - y1) * t_in
-    x2_recortado = x1 + (x2 - x1) * t_out
-    y2_recortado = y1 + (y2 - y1) * t_out
-    
-    return (x1_recortado, y1_recortado, x2_recortado, y2_recortado)
-# Función para aplicar el algoritmo a todos los puntos
-def recortar_personaje_cyrus(personaje_elementos, xmin, xmax, ymin, ymax):
-    personaje_recortado = []
-    for (x1, y1, x2, y2) in personaje_elementos:
-        recortado = cyrus_beck_clip(x1, y1, x2, y2, xmin, xmax, ymin, ymax)
-        if recortado:
-            personaje_recortado.append(recortado)
-    return personaje_recortado
-
 def esta_dentro(x, y, xmin, xmax, ymin, ymax):
     """Verifica si el punto (x, y) está dentro de los límites de la ventana."""
     return xmin <= x <= xmax and ymin <= y <= ymax
 
 def intersecar_con_borde(x1, y1, x2, y2, xmin, xmax, ymin, ymax):
-    """Recorta una línea a la ventana usando un método exhaustivo."""
+    """Recorta una línea a la ventana usando un método exhaustivo mejorado."""
     # Comprobar si ambos puntos están dentro de la ventana
     if esta_dentro(x1, y1, xmin, xmax, ymin, ymax) and esta_dentro(x2, y2, xmin, xmax, ymin, ymax):
         return (x1, y1, x2, y2)  # No hay recorte necesario
-    
-    # Recortar línea en cada borde de la ventana si es necesario
-    # Los 4 bordes: inferior, derecho, superior, izquierdo
+
+    # Comprobar si la línea está completamente fuera
+    if (x1 < xmin and x2 < xmin) or (x1 > xmax and x2 > xmax) or (y1 < ymin and y2 < ymin) or (y1 > ymax and y2 > ymax):
+        return None  # Línea completamente fuera de la ventana
+
+    # Lista para almacenar las intersecciones
     puntos_recortados = []
 
     # Recortar con borde inferior (y = ymin)
-    if y1 != y2:
-        if (y1 < ymin and y2 > ymin) or (y1 > ymin and y2 < ymin):
-            t = (ymin - y1) / (y2 - y1)
-            x_interseccion = x1 + t * (x2 - x1)
-            if xmin <= x_interseccion <= xmax:
-                puntos_recortados.append((x_interseccion, ymin))
-    
+    if y1 != y2 and ((y1 < ymin and y2 > ymin) or (y1 > ymin and y2 < ymin)):
+        t = (ymin - y1) / (y2 - y1)
+        x_interseccion = x1 + t * (x2 - x1)
+        if xmin <= x_interseccion <= xmax:
+            puntos_recortados.append((x_interseccion, ymin))
+
     # Recortar con borde superior (y = ymax)
-    if y1 != y2:
-        if (y1 > ymax and y2 < ymax) or (y1 < ymax and y2 > ymax):
-            t = (ymax - y1) / (y2 - y1)
-            x_interseccion = x1 + t * (x2 - x1)
-            if xmin <= x_interseccion <= xmax:
-                puntos_recortados.append((x_interseccion, ymax))
+    if y1 != y2 and ((y1 > ymax and y2 < ymax) or (y1 < ymax and y2 > ymax)):
+        t = (ymax - y1) / (y2 - y1)
+        x_interseccion = x1 + t * (x2 - x1)
+        if xmin <= x_interseccion <= xmax:
+            puntos_recortados.append((x_interseccion, ymax))
 
     # Recortar con borde izquierdo (x = xmin)
-    if x1 != x2:
-        if (x1 < xmin and x2 > xmin) or (x1 > xmin and x2 < xmin):
-            t = (xmin - x1) / (x2 - x1)
-            y_interseccion = y1 + t * (y2 - y1)
-            if ymin <= y_interseccion <= ymax:
-                puntos_recortados.append((xmin, y_interseccion))
-    
-    # Recortar con borde derecho (x = xmax)
-    if x1 != x2:
-        if (x1 > xmax and x2 < xmax) or (x1 < xmax and x2 > xmax):
-            t = (xmax - x1) / (x2 - x1)
-            y_interseccion = y1 + t * (y2 - y1)
-            if ymin <= y_interseccion <= ymax:
-                puntos_recortados.append((xmax, y_interseccion))
+    if x1 != x2 and ((x1 < xmin and x2 > xmin) or (x1 > xmin and x2 < xmin)):
+        t = (xmin - x1) / (x2 - x1)
+        y_interseccion = y1 + t * (y2 - y1)
+        if ymin <= y_interseccion <= ymax:
+            puntos_recortados.append((xmin, y_interseccion))
 
-    if puntos_recortados:
-        # Devuelve el primer y último punto recortado de la línea
-        return (puntos_recortados[0][0], puntos_recortados[0][1], puntos_recortados[-1][0], puntos_recortados[-1][1])
-    
-    return None  # La línea no intersecta con la ventana
+    # Recortar con borde derecho (x = xmax)
+    if x1 != x2 and ((x1 > xmax and x2 < xmax) or (x1 < xmax and x2 > xmax)):
+        t = (xmax - x1) / (x2 - x1)
+        y_interseccion = y1 + t * (y2 - y1)
+        if ymin <= y_interseccion <= ymax:
+            puntos_recortados.append((xmax, y_interseccion))
+
+    # Agregar los puntos dentro de la ventana
+    if esta_dentro(x1, y1, xmin, xmax, ymin, ymax):
+        puntos_recortados.append((x1, y1))
+    if esta_dentro(x2, y2, xmin, xmax, ymin, ymax):
+        puntos_recortados.append((x2, y2))
+
+    # Imprimir intersecciones detectadas (para depuración)
+    print(f"Línea original: ({x1}, {y1}) -> ({x2}, {y2})")
+    print(f"Intersecciones detectadas: {puntos_recortados}")
+
+    # Si hay intersecciones, devuelve el tramo visible de la línea
+    if len(puntos_recortados) >= 2:
+        puntos_recortados.sort(key=lambda p: (p[1], p[0]))  # Ordenar puntos por posición vertical y luego horizontal
+        return (puntos_recortados[0][0], puntos_recortados[0][1],
+                puntos_recortados[1][0], puntos_recortados[1][1])
+
+    return None  # Línea no intersecta con la ventana
 
 def recortar_personaje_exahustivo(personaje_elementos, xmin, xmax, ymin, ymax):
     """Recorta todos los elementos del personaje usando el algoritmo exhaustivo."""
@@ -508,6 +440,9 @@ def recortar_personaje_exahustivo(personaje_elementos, xmin, xmax, ymin, ymax):
         recortado = intersecar_con_borde(x1, y1, x2, y2, xmin, xmax, ymin, ymax)
         if recortado:
             personaje_recortado.append(recortado)
+        else:
+            # No dibujar la línea si está completamente fuera
+            continue
     return personaje_recortado
 
 def menu(spacing = 40, button_width = 140, button_height = 30):
@@ -527,6 +462,11 @@ def menu(spacing = 40, button_width = 140, button_height = 30):
     autores_text.setStyle("bold")      
     autores_text.draw(win)
     
+    fecha_text = Text(Point(0, 1 * spacing), "04 / 12 / 2024")
+    fecha_text.setSize(12) 
+    fecha_text.setStyle("bold")      
+    fecha_text.draw(win)
+    
     iniciar_button = Button(win, Point(0, -50), button_width + 30, button_height, "Empezar programa")
     activity_button = Button(win, Point(0, -50- spacing), button_width + 30, button_height, "Empezar actividad")
     salir_button = Button(win, Point(0, -50 - 2 *spacing), button_width + 30, button_height, "Salir")
@@ -545,6 +485,7 @@ def menu(spacing = 40, button_width = 140, button_height = 30):
             autores_text.undraw()
             iniciar_button.undraw()     
             activity_button.undraw()
+            fecha_text.undraw()
             salir_button.undraw()
             print("Mensaje y botón borrados")
             return 1
@@ -555,6 +496,7 @@ def menu(spacing = 40, button_width = 140, button_height = 30):
             autores_text.undraw()
             iniciar_button.undraw()     
             activity_button.undraw()
+            fecha_text.undraw()
             salir_button.undraw()
             print("Mensaje y botón borrados")
             return 2
@@ -591,10 +533,10 @@ def main():
             # Crear botones en el borde superior derecho
             crear_obj_button = Button(win, Point(x_position, y_start + 3 * spacing), button_width, button_height, "Crear personaje")
             aplicar_Sutherland_button = Button(win, Point(x_position, y_start + 2 * spacing), button_width, button_height, "Cohen-Sutherland")
-            aplicarCyrus_button = Button(win, Point(x_position, y_start +  spacing), button_width, button_height, "Cyrus-Beck")
-            aplicarExa_button = Button(win, Point(x_position, y_start), button_width, button_height, "Exahustivo")
-            volver_button = Button(win, Point(x_position, y_start -  spacing), button_width, button_height, "Volver")
-            salir_button = Button(win, Point(x_position, y_start - 2 * spacing), button_width, button_height, "Salir")
+            aplicarExa_button = Button(win, Point(x_position, y_start+ spacing), button_width, button_height, "Exahustivo")
+            volver_button = Button(win, Point(x_position, y_start ), button_width, button_height, "Volver")
+            salir_button = Button(win, Point(x_position, y_start - spacing), button_width, button_height, "Salir")
+
             
             error_text = Text(Point(0, 5 * spacing), "Ingrese un número valido")
             error_text.setSize(18) 
@@ -608,7 +550,6 @@ def main():
             # Activar los botones
             crear_obj_button.activate()
             aplicar_Sutherland_button.activate()
-            aplicarCyrus_button.activate()
             aplicarExa_button.activate()
             volver_button.activate()
             salir_button.activate()
@@ -636,23 +577,11 @@ def main():
                     # Dibujar las líneas del personaje recortadas
                     for (x1, y1, x2, y2) in personaje_recortado:
                         LineaBresenham(x1, y1, x2, y2, win, 2, color= "blue")
-                        
-                elif aplicarCyrus_button.is_clicked(click_point):
-                    # Aplicar algoritmo de Cyrus-Beck
-                    personaje_recortado = recortar_personaje_cyrus(personaje_elementos, xmin, xmax, ymin, ymax)
-                    
-                    # undraw_personaje(win,pixel_size)
-                    for (x1, y1, x2, y2) in personaje_elementos:
-                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
-                        
-                    # Dibujar las líneas del personaje recortadas
-                    for (x1, y1, x2, y2) in personaje_recortado:
-                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "red")
-                        
+
                 elif aplicarExa_button.is_clicked(click_point):
                     # Aplicar algoritmo de Cyrus-Beck
                     personaje_recortado = recortar_personaje_exahustivo(personaje_elementos, xmin, xmax, ymin, ymax)
-                    
+                
                     # undraw_personaje(win,pixel_size)
                     for (x1, y1, x2, y2) in personaje_elementos:
                         LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
@@ -664,7 +593,6 @@ def main():
                     
                     crear_obj_button.undraw()
                     aplicar_Sutherland_button.undraw()
-                    aplicarCyrus_button.undraw()
                     aplicarExa_button.undraw()
                     volver_button.undraw()
                     salir_button.undraw()
@@ -684,10 +612,9 @@ def main():
             crear_ventana_button = Button(win, Point(x_position * -1, y_start + 6 * spacing), button_width, button_height, "Crear ventana")
             crear_linea_button = Button(win, Point(x_position * -1, y_start + 5 * spacing), button_width, button_height, "Crear linea")
             aplicar_Sutherland_button = Button(win, Point(x_position  * -1, y_start ), button_width, button_height, "Cohen-Sutherland")
-            aplicarCyrus_button = Button(win, Point(x_position  * -1, y_start - spacing), button_width, button_height, "Cyrus-Beck")
-            aplicarExa_button = Button(win, Point(x_position  * -1, y_start - 2 * spacing), button_width, button_height, "Exahustivo")
-            volver_button = Button(win, Point(x_position * -1, y_start - 3 * spacing), button_width, button_height, "Volver")
-            salir_button = Button(win, Point(x_position * -1, y_start - 4 * spacing), button_width, button_height, "Salir")
+            volver_button = Button(win, Point(x_position * -1, y_start - 1 * spacing), button_width, button_height, "Volver")
+            salir_button = Button(win, Point(x_position * -1, y_start - 2 * spacing), button_width, button_height, "Salir")
+
             
             error_text = Text(Point(0, 5 * spacing), "Ingrese un número valido")
             error_text.setSize(18) 
@@ -700,8 +627,6 @@ def main():
             x1_text.draw(win)  
             ingresar_texto_x1= Entry(Point((x_position * -1) + 30, y_start + 4 * spacing), 6)
             ingresar_texto_x1.setFill("lightgray")
-            
-            
             y1_text = Text(Point((x_position * -1 )-30, y_start + 3 * spacing), "y1")
             y1_text.setSize(10)          
             y1_text.setStyle("bold")      
@@ -715,7 +640,6 @@ def main():
             x2_text.draw(win)  
             ingresar_texto_x2= Entry(Point((x_position * -1) + 30, y_start + 2 * spacing), 6)
             ingresar_texto_x2.setFill("lightgray")
-            
             y2_text = Text(Point((x_position * -1 )-30, y_start +  spacing), "y2")
             y2_text.setSize(10)          
             y2_text.setStyle("bold")      
@@ -730,8 +654,6 @@ def main():
             ingresar_texto_x2.draw(win)
             ingresar_texto_y2.draw(win)
             aplicar_Sutherland_button.activate()
-            aplicarCyrus_button.activate()
-            aplicarExa_button.activate()
             volver_button.activate()
             salir_button.activate()
             # Declaraciones extras
@@ -779,37 +701,12 @@ def main():
                     # Dibujar las líneas del personaje recortadas
                     for (x1, y1, x2, y2) in puntos_recortado:
                         LineaBresenham(x1, y1, x2, y2, win, 2, color= "blue")
-                        
-                elif aplicarCyrus_button.is_clicked(click_point):
-                    # Aplicar algoritmo de Cyrus-Beck
-                    puntos_recortado = recortar_personaje_cyrus(puntos, xmin, xmax, ymin, ymax)
-                    
-                    # undraw_personaje(win,pixel_size)
-                    for (x1, y1, x2, y2) in puntos:
-                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
-                        
-                    # Dibujar las líneas del personaje recortadas
-                    for (x1, y1, x2, y2) in puntos_recortado:
-                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "red")
-                        
-                elif aplicarExa_button.is_clicked(click_point):
-                    # Aplicar algoritmo de Cyrus-Beck
-                    puntos_recortado = recortar_personaje_exahustivo(puntos, xmin, xmax, ymin, ymax)
-                    
-                    # undraw_personaje(win,pixel_size)
-                    for (x1, y1, x2, y2) in puntos:
-                        LineaBresenham_borrado(x1, y1, x2, y2, win, 2)
-                        
-                    # Dibujar las líneas del personaje recortadas
-                    for (x1, y1, x2, y2) in puntos_recortado:
-                        LineaBresenham(x1, y1, x2, y2, win, 2, color= "green")
+
                 elif volver_button.is_clicked(click_point):
                     
                     crear_ventana_button.undraw()
                     crear_linea_button.undraw()
                     aplicar_Sutherland_button.undraw()
-                    aplicarCyrus_button.undraw()
-                    aplicarExa_button.undraw()
                     volver_button.undraw()
                     salir_button.undraw()
                     
